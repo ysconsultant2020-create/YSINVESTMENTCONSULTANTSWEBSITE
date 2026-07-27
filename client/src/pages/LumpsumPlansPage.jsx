@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import AppointmentForm from '../components/client/AppointmentForm';
-import { lumpsumPlanAPI } from '../services/api';
+import { lumpsumPlanAPI, getImageUrl } from '../services/api';
 import toast from 'react-hot-toast';
 
 const riskBadge = (risk) => {
@@ -82,7 +82,7 @@ const LumpsumPlansPage = () => {
               >
                 {plan.image && (
                   <div className="h-48 overflow-hidden">
-                    <img src={plan.image} alt={plan.planName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={getImageUrl(plan.image)} alt={plan.planName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                 )}
                 <div className="p-6">
@@ -114,7 +114,7 @@ const LumpsumPlansPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setDetailPlan(null)}>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl glass-card-strong p-8 max-h-[85vh] overflow-y-auto">
-            {detailPlan.image && <img src={detailPlan.image} alt={detailPlan.planName} className="w-full h-64 object-cover rounded-xl mb-6" />}
+            {detailPlan.image && <img src={getImageUrl(detailPlan.image)} alt={detailPlan.planName} className="w-full h-64 object-cover rounded-xl mb-6" />}
             <h2 className="text-2xl font-bold text-white mb-4">{detailPlan.planName}</h2>
             <div className="space-y-3 text-white/70 text-sm">
               <p>{detailPlan.description}</p>

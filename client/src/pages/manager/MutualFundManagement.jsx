@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, X, Search, TrendingUp } from 'lucide-react';
-import { mutualFundAPI } from '../../services/api';
+import { mutualFundAPI, getImageUrl } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const risks = ['Low', 'Moderate', 'High', 'Very High'];
+const categories = ['Equity', 'Debt', 'Hybrid', 'ELSS (Tax Saving)', 'Liquid'];
 const emptyForm = { fundName: '', amc: '', riskLevel: 'Moderate', category: '', returns: '', description: '', minInvestment: '', isActive: true };
 
 const MutualFundManagement = () => {
@@ -75,7 +76,7 @@ const MutualFundManagement = () => {
               </tr></thead>
               <tbody>{filtered.map((item) => (
                 <tr key={item._id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                  <td className="py-3 px-4"><div className="flex items-center gap-3">{item.image && <img src={item.image} alt="" className="w-10 h-10 rounded-lg object-cover" />}<div><p className="text-white font-medium">{item.fundName}</p><p className="text-white/40 text-xs">{item.category}</p></div></div></td>
+                  <td className="py-3 px-4"><div className="flex items-center gap-3">{item.image && <img src={getImageUrl(item.image)} alt="" className="w-10 h-10 rounded-lg object-cover" />}<div><p className="text-white font-medium">{item.fundName}</p><p className="text-white/40 text-xs">{item.category}</p></div></div></td>
                   <td className="py-3 px-4 text-white/60">{item.amc}</td>
                   <td className="py-3 px-4"><span className={rb(item.riskLevel)}>{item.riskLevel}</span></td>
                   <td className="py-3 px-4 text-green-400">{item.returns || 'N/A'}</td>

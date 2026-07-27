@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, X, Search, PieChart } from 'lucide-react';
-import { lumpsumPlanAPI } from '../../services/api';
+import { lumpsumPlanAPI, getImageUrl } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const risks = ['Low', 'Moderate', 'High', 'Very High'];
@@ -95,7 +95,7 @@ const LumpsumPlanManagement = () => {
                   <tr key={item._id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        {item.image && <img src={item.image} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                        {item.image && <img src={getImageUrl(item.image)} alt="" className="w-10 h-10 rounded-lg object-cover" />}
                         <span className="text-white font-medium">{item.planName}</span>
                       </div>
                     </td>

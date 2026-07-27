@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import AppointmentForm from '../components/client/AppointmentForm';
-import { mutualFundAPI } from '../services/api';
+import { mutualFundAPI, getImageUrl } from '../services/api';
 import toast from 'react-hot-toast';
 
 const riskBadge = (risk) => {
@@ -110,20 +110,19 @@ const MutualFundsPage = () => {
                 className="glass-card overflow-hidden group hover:border-gold-400/20 transition-all duration-300">
                 {fund.image && (
                   <div className="h-48 overflow-hidden">
-                    <img src={fund.image} alt={fund.fundName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={getImageUrl(fund.image)} alt={fund.fundName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                 )}
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-medium text-white/50">{fund.amc}</span>
+                    <span className="text-white/50 text-xs">{fund.amc}</span>
                     <span className={riskBadge(fund.riskLevel)}>{fund.riskLevel}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-1">{fund.fundName}</h3>
-                  <p className="text-white/40 text-xs mb-2">Category: {fund.category}</p>
+                  <h3 className="text-lg font-bold text-white mb-2">{fund.fundName}</h3>
                   <p className="text-white/50 text-sm line-clamp-2 mb-4">{fund.description}</p>
-                  <div className="flex items-center justify-between mb-4">
-                    {fund.returns && <span className="text-green-400 font-semibold text-sm">Returns: {fund.returns}</span>}
-                    {fund.minInvestment && <span className="text-white/40 text-xs">Min: ₹{fund.minInvestment}</span>}
+                  <div className="flex items-center justify-between mb-4 text-sm">
+                    {fund.returns && <span className="text-green-400 font-semibold">{fund.returns} p.a.</span>}
+                    {fund.minInvestment && <span className="text-gold-400 font-medium">Min: ₹{fund.minInvestment}</span>}
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => setDetailFund(fund)} className="flex-1 btn-outline !px-3 !py-2 text-xs">Details</button>
@@ -142,7 +141,7 @@ const MutualFundsPage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setDetailFund(null)}>
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             onClick={(e) => e.stopPropagation()} className="w-full max-w-2xl glass-card-strong p-8 max-h-[85vh] overflow-y-auto">
-            {detailFund.image && <img src={detailFund.image} alt={detailFund.fundName} className="w-full h-64 object-cover rounded-xl mb-6" />}
+            {detailFund.image && <img src={getImageUrl(detailFund.image)} alt={detailFund.fundName} className="w-full h-64 object-cover rounded-xl mb-6" />}
             <div className="flex items-center gap-3 mb-3">
               <span className="text-white/50 text-sm">{detailFund.amc}</span>
               <span className={riskBadge(detailFund.riskLevel)}>{detailFund.riskLevel}</span>

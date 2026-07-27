@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, Edit2, Trash2, X, Search, Wallet } from 'lucide-react';
-import { sipPlanAPI } from '../../services/api';
+import { sipPlanAPI, getImageUrl } from '../../services/api';
 import toast from 'react-hot-toast';
 
 const risks = ['Low', 'Moderate', 'High', 'Very High'];
@@ -73,7 +73,7 @@ const SipPlanManagement = () => {
           </tr></thead>
           <tbody>{filtered.map((item) => (
             <tr key={item._id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-              <td className="py-3 px-4"><div className="flex items-center gap-3">{item.image && <img src={item.image} alt="" className="w-10 h-10 rounded-lg object-cover" />}<span className="text-white font-medium">{item.planName}</span></div></td>
+              <td className="py-3 px-4"><div className="flex items-center gap-3">{item.image && <img src={getImageUrl(item.image)} alt="" className="w-10 h-10 rounded-lg object-cover" />}<span className="text-white font-medium">{item.planName}</span></div></td>
               <td className="py-3 px-4 text-gold-400">₹{item.minAmount}</td>
               <td className="py-3 px-4 text-white/60">{item.duration}</td>
               <td className="py-3 px-4"><span className={rb(item.risk)}>{item.risk}</span></td>

@@ -2,6 +2,14 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'https://ysinvestmentconsultantswebsite-1.onrender.com';
 
+export const getImageUrl = (imagePath) => {
+  if (!imagePath) return '';
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  return `${API_URL}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+};
+
 const api = axios.create({
   baseURL: `${API_URL}/api`,
   headers: { 'Content-Type': 'application/json' }
