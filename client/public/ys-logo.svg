@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="goldGradLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5e19e" />
+      <stop offset="50%" stop-color="#d4af37" />
+      <stop offset="100%" stop-color="#b8962f" />
+    </linearGradient>
+    <linearGradient id="navyGradLogo" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#354f8a" />
+      <stop offset="100%" stop-color="#0a1628" />
+    </linearGradient>
+  </defs>
+
+  <circle cx="100" cy="100" r="92" fill="#0f1d32" stroke="url(#goldGradLogo)" stroke-width="6" />
+
+  <rect x="35" y="105" width="12" height="35" rx="3" fill="url(#goldGradLogo)" opacity="0.8" />
+  <rect x="52" y="90" width="12" height="50" rx="3" fill="url(#goldGradLogo)" opacity="0.9" />
+  <rect x="69" y="75" width="12" height="65" rx="3" fill="url(#goldGradLogo)" />
+
+  <path d="M 50 55 L 75 95 L 75 145 M 100 55 L 75 95" stroke="#ffffff" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <path d="M 145 65 C 130 50, 105 55, 105 75 C 105 95, 145 95, 145 118 C 145 140, 115 145, 100 130" stroke="url(#goldGradLogo)" stroke-width="16" stroke-linecap="round" fill="none" />
+  <path d="M 110 50 L 155 40 L 145 75" fill="none" stroke="url(#goldGradLogo)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

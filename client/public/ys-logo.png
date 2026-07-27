@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c9a84c"/>
+      <stop offset="50%" style="stop-color:#d4af37"/>
+      <stop offset="100%" style="stop-color:#e8c44a"/>
+    </linearGradient>
+    <linearGradient id="navyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a1628"/>
+      <stop offset="100%" style="stop-color:#1a2942"/>
+    </linearGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="none" stroke="url(#goldGrad)" stroke-width="2" opacity="0.3"/>
+  <!-- Bar chart on Y -->
+  <rect x="28" y="95" width="8" height="30" fill="url(#navyGrad)" rx="2"/>
+  <rect x="40" y="80" width="8" height="45" fill="url(#navyGrad)" rx="2"/>
+  <rect x="52" y="65" width="8" height="60" fill="url(#navyGrad)" rx="2"/>
+  <!-- Y letter -->
+  <text x="55" y="115" font-family="Georgia, serif" font-size="80" font-weight="bold" fill="url(#navyGrad)">Y</text>
+  <!-- S letter with gold -->
+  <text x="105" y="115" font-family="Georgia, serif" font-size="80" font-weight="bold" fill="url(#goldGrad)">S</text>
+  <!-- Arrow -->
+  <path d="M140 55 L155 40 L155 50 L170 50 L170 58 L155 58 L155 68 Z" fill="url(#goldGrad)" transform="rotate(-15 155 55)"/>
+</svg>

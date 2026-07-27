@@ -1,0 +1,26 @@
+# Dependency directories
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production builds
+dist/
+client/dist/
+build/
+
+# Environment files & secrets (DO NOT COMMIT)
+.env
+.env.local
+server/.env
+client/.env
+
+# Uploaded files
+server/uploads/*
+!server/uploads/.gitkeep
+
+# IDE & System junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
