@@ -29,7 +29,7 @@ exports.create = async (req, res, next) => {
   try {
     const data = { ...req.body };
     if (req.file) {
-      data.image = `/uploads/${req.file.filename}`;
+      data.image = req.file.path || req.file.secure_url || `/uploads/${req.file.filename}`;
     }
     const item = await MutualFund.create(data);
     res.status(201).json(item);
@@ -43,9 +43,9 @@ exports.update = async (req, res, next) => {
   try {
     const data = { ...req.body };
     if (req.file) {
-      data.image = `/uploads/${req.file.filename}`;
+      data.image = req.file.path || req.file.secure_url || `/uploads/${req.file.filename}`;
       const old = await MutualFund.findById(req.params.id);
-      if (old && old.image) {
+      if (old && old.image && old.image.startsWith('/uploads/')) {
         const oldPath = path.join(__dirname, '..', old.image);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }
@@ -66,7 +66,7 @@ exports.remove = async (req, res, next) => {
   try {
     const item = await MutualFund.findById(req.params.id);
     if (!item) return res.status(404).json({ message: 'Mutual fund not found' });
-    if (item.image) {
+    if (item.image && item.image.startsWith('/uploads/')) {
       const imgPath = path.join(__dirname, '..', item.image);
       if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
     }

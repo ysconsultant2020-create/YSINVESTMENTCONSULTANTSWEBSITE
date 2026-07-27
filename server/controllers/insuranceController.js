@@ -32,7 +32,7 @@ exports.create = async (req, res, next) => {
   try {
     const data = { ...req.body };
     if (req.file) {
-      data.image = `/uploads/${req.file.filename}`;
+      data.image = req.file.path || req.file.secure_url || `/uploads/${req.file.filename}`;
     }
     const item = await Insurance.create(data);
     res.status(201).json(item);
@@ -46,10 +46,10 @@ exports.update = async (req, res, next) => {
   try {
     const data = { ...req.body };
     if (req.file) {
-      data.image = `/uploads/${req.file.filename}`;
-      // Delete old image
+      data.image = req.file.path || req.file.secure_url || `/uploads/${req.file.filename}`;
+      // Delete old image if local
       const old = await Insurance.findById(req.params.id);
-      if (old && old.image) {
+      if (old && old.image && old.image.startsWith('/uploads/')) {
         const oldPath = path.join(__dirname, '..', old.image);
         if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
       }
@@ -71,7 +71,7 @@ exports.remove = async (req, res, next) => {
     const item = await Insurance.findById(req.params.id);
     if (!item) return res.status(404).json({ message: 'Insurance not found' });
     // Delete image file
-    if (item.image) {
+    if (item.image && item.image.startsWith('/uploads/')) {
       const imgPath = path.join(__dirname, '..', item.image);
       if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
     }
