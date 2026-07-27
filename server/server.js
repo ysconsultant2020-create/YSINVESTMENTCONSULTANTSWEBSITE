@@ -50,6 +50,24 @@ app.use('/api/appointments', require('./routes/appointment'));
 app.use('/api/customers', require('./routes/customer'));
 app.use('/api/contact', require('./routes/contact'));
 
+// Root Welcome Route
+app.get('/', (req, res, next) => {
+  const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
+  if (require('fs').existsSync(clientDistPath)) return next();
+  res.json({
+    status: 'Success',
+    message: 'YS Investment Consultants Backend API is Live!',
+    healthCheck: '/api/health',
+    endpoints: [
+      '/api/insurance',
+      '/api/mutual-funds',
+      '/api/sip-plans',
+      '/api/lumpsum-plans',
+      '/api/contact'
+    ]
+  });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'YS Investment Consultants API is running' });
