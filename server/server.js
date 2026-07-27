@@ -29,7 +29,7 @@ app.use('/api', limiter);
 
 // CORS
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL || true,
   credentials: true
 }));
 
@@ -54,6 +54,16 @@ app.use('/api/contact', require('./routes/contact'));
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'YS Investment Consultants API is running' });
 });
+
+// Serve frontend client dist static build in production if present
+const clientDistPath = path.join(__dirname, '..', 'client', 'dist');
+if (require('fs').existsSync(clientDistPath)) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 // Error handling middleware
 app.use(require('./middleware/errorHandler'));
