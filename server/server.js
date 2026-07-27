@@ -15,6 +15,9 @@ connectDB().then(() => {
 
 const app = express();
 
+// Trust proxy for Render / Cloud reverse proxies
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
 app.use(mongoSanitize());
@@ -22,7 +25,8 @@ app.use(mongoSanitize());
 // Rate limiter
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: 500,
+  validate: { xForwardedForHeader: false },
   message: { message: 'Too many requests, please try again later.' }
 });
 app.use('/api', limiter);
