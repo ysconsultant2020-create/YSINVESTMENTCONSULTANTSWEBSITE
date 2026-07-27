@@ -2,7 +2,6 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 // Ensure uploads directory exists locally
 const uploadsDir = path.join(__dirname, '..', 'uploads');
@@ -13,13 +12,13 @@ if (!fs.existsSync(uploadsDir)) {
 // Configure Cloudinary credentials if present
 if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
   cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME.trim(),
+    api_key: process.env.CLOUDINARY_API_KEY.trim(),
+    api_secret: process.env.CLOUDINARY_API_SECRET.trim()
   });
 }
 
-const isCloudinaryConfigured = !!(
+const isCloudinaryConfigured = () => !!(
   process.env.CLOUDINARY_CLOUD_NAME &&
   process.env.CLOUDINARY_API_KEY &&
   process.env.CLOUDINARY_API_SECRET
@@ -38,63 +37,66 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Local Storage Engine
-const localStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const localUpload = multer({
-  storage: localStorage,
+// Memory storage engine (parses request stream ONCE)
+const memoryUpload = multer({
+  storage: multer.memoryStorage(),
   fileFilter,
-  limits: { fileSize: 10 * 1024 * 1024 }
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-let cloudinaryUpload;
-if (isCloudinaryConfigured) {
-  try {
-    const cloudStorage = new CloudinaryStorage({
-      cloudinary: cloudinary,
-      params: {
-        folder: 'ys_investment_consultants',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'],
-        transformation: [{ width: 1200, height: 1200, crop: 'limit' }]
-      }
-    });
-    cloudinaryUpload = multer({
-      storage: cloudStorage,
-      fileFilter,
-      limits: { fileSize: 10 * 1024 * 1024 }
-    });
-  } catch (err) {
-    console.warn('Failed to initialize Cloudinary storage engine:', err.message);
-  }
-}
-
-// Wrapper middleware to gracefully handle upload errors
+// Middleware to upload single file
 const uploadSingle = (fieldname) => {
   return (req, res, next) => {
-    if (isCloudinaryConfigured && cloudinaryUpload) {
-      cloudinaryUpload.single(fieldname)(req, res, (err) => {
-        if (!err) return next();
-        console.warn('Cloudinary upload error, falling back to local storage:', err.message);
-        // Fall back to local upload
-        localUpload.single(fieldname)(req, res, (localErr) => {
-          if (localErr) return res.status(400).json({ message: localErr.message || 'Image upload failed' });
-          next();
-        });
-      });
-    } else {
-      localUpload.single(fieldname)(req, res, (err) => {
-        if (err) return res.status(400).json({ message: err.message || 'Image upload failed' });
+    memoryUpload.single(fieldname)(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ message: err.message || 'File upload error' });
+      }
+
+      if (!req.file) {
+        return next();
+      }
+
+      const ext = path.extname(req.file.originalname) || '.png';
+      const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
+
+      // If Cloudinary is configured, attempt upload via stream
+      if (isCloudinaryConfigured()) {
+        try {
+          const uploadPromise = new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              {
+                folder: 'ys_investment_consultants',
+                public_id: path.basename(uniqueName, ext),
+                resource_type: 'auto'
+              },
+              (cloudErr, result) => {
+                if (cloudErr) return reject(cloudErr);
+                resolve(result);
+              }
+            );
+            stream.end(req.file.buffer);
+          });
+
+          const result = await uploadPromise;
+          req.file.path = result.secure_url;
+          return next();
+        } catch (cloudErr) {
+          console.warn('Cloudinary upload error, falling back to local file saving:', cloudErr.message);
+        }
+      }
+
+      // Local disk fallback
+      try {
+        const localPath = path.join(uploadsDir, uniqueName);
+        fs.writeFileSync(localPath, req.file.buffer);
+        req.file.path = `/uploads/${uniqueName}`;
+        req.file.filename = uniqueName;
         next();
-      });
-    }
+      } catch (localErr) {
+        console.error('Local file write error:', localErr);
+        res.status(500).json({ message: 'Failed to save image file' });
+      }
+    });
   };
 };
 
