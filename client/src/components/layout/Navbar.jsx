@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Menu, X, ChevronDown, LogOut, LayoutDashboard, Calculator,
-  TrendingUp, Shield, Wallet, PieChart, Sparkles, ArrowRight
+  TrendingUp, Shield, Wallet, PieChart, Sparkles
 } from 'lucide-react';
 import Logo from '../ui/Logo';
 
@@ -13,6 +13,9 @@ const Navbar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [calcDropdownOpen, setCalcDropdownOpen] = useState(false);
+
+  const servicesRef = useRef(null);
+  const calcRef = useRef(null);
 
   const { user, isAuthenticated, isManager, logout } = useAuth();
   const location = useLocation();
@@ -24,11 +27,25 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close dropdowns on route change or click outside
   useEffect(() => {
     setIsMobileOpen(false);
     setServicesDropdownOpen(false);
     setCalcDropdownOpen(false);
   }, [location]);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (servicesRef.current && !servicesRef.current.contains(e.target)) {
+        setServicesDropdownOpen(false);
+      }
+      if (calcRef.current && !calcRef.current.contains(e.target)) {
+        setCalcDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -70,7 +87,7 @@ const Navbar = () => {
               <Logo size="md" />
             </Link>
 
-            {/* Central Desktop Nav Items - Compact Single Line */}
+            {/* Central Desktop Nav Items */}
             <div className="hidden lg:flex items-center gap-1 bg-white/[0.04] border border-white/10 px-2 py-1.5 rounded-2xl backdrop-blur-2xl shadow-inner">
               
               {/* Home */}
@@ -86,12 +103,16 @@ const Navbar = () => {
               </Link>
 
               {/* Services Dropdown */}
-              <div className="relative" onMouseLeave={() => setServicesDropdownOpen(false)}>
+              <div
+                ref={servicesRef}
+                className="relative"
+                onMouseEnter={() => setServicesDropdownOpen(true)}
+                onMouseLeave={() => setServicesDropdownOpen(false)}
+              >
                 <button
-                  onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
-                  onMouseEnter={() => setServicesDropdownOpen(true)}
+                  onClick={() => setServicesDropdownOpen(prev => !prev)}
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                    isServicesActive
+                    isServicesActive || servicesDropdownOpen
                       ? 'text-gold-400 bg-gold-400/10 border border-gold-400/20'
                       : 'text-white/80 hover:text-white hover:bg-white/5'
                   }`}
@@ -103,32 +124,36 @@ const Navbar = () => {
                 <AnimatePresence>
                   {servicesDropdownOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.96 }}
-                      className="absolute top-full left-0 mt-3 w-80 bg-[#0c182c] border border-gold-400/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] p-3.5 z-[100]"
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 pt-2 w-80 z-[100]"
                     >
-                      <div className="text-xs font-semibold text-gold-400 uppercase tracking-wider px-3 py-1 mb-1 flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5" /> Investment & Advisory
-                      </div>
-                      <div className="space-y-1">
-                        {services.map((item) => (
-                          <Link
-                            key={item.href}
-                            to={item.href}
-                            className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-all group"
-                          >
-                            <div className={`p-2 rounded-lg ${item.bg} shrink-0 mt-0.5`}>
-                              <item.icon className={`w-4 h-4 ${item.color}`} />
-                            </div>
-                            <div>
-                              <span className="text-sm font-semibold text-white group-hover:text-gold-400 transition-colors block">
-                                {item.name}
-                              </span>
-                              <span className="text-xs text-white/50 block leading-tight">{item.desc}</span>
-                            </div>
-                          </Link>
-                        ))}
+                      <div className="bg-[#0c182c] border border-gold-400/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] p-3.5">
+                        <div className="text-xs font-semibold text-gold-400 uppercase tracking-wider px-3 py-1 mb-1 flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5" /> Investment & Advisory
+                        </div>
+                        <div className="space-y-1">
+                          {services.map((item) => (
+                            <Link
+                              key={item.href}
+                              to={item.href}
+                              onClick={() => setServicesDropdownOpen(false)}
+                              className="flex items-start gap-3 p-2.5 rounded-xl hover:bg-white/10 transition-all group"
+                            >
+                              <div className={`p-2 rounded-lg ${item.bg} shrink-0 mt-0.5`}>
+                                <item.icon className={`w-4 h-4 ${item.color}`} />
+                              </div>
+                              <div>
+                                <span className="text-sm font-semibold text-white group-hover:text-gold-400 transition-colors block">
+                                  {item.name}
+                                </span>
+                                <span className="text-xs text-white/50 block leading-tight">{item.desc}</span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     </motion.div>
                   )}
@@ -136,12 +161,16 @@ const Navbar = () => {
               </div>
 
               {/* Calculators Dropdown */}
-              <div className="relative" onMouseLeave={() => setCalcDropdownOpen(false)}>
+              <div
+                ref={calcRef}
+                className="relative"
+                onMouseEnter={() => setCalcDropdownOpen(true)}
+                onMouseLeave={() => setCalcDropdownOpen(false)}
+              >
                 <button
-                  onClick={() => setCalcDropdownOpen(!calcDropdownOpen)}
-                  onMouseEnter={() => setCalcDropdownOpen(true)}
+                  onClick={() => setCalcDropdownOpen(prev => !prev)}
                   className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                    isCalcActive
+                    isCalcActive || calcDropdownOpen
                       ? 'text-gold-400 bg-gold-400/10 border border-gold-400/20'
                       : 'text-white/80 hover:text-white hover:bg-white/5'
                   }`}
@@ -154,27 +183,31 @@ const Navbar = () => {
                 <AnimatePresence>
                   {calcDropdownOpen && (
                     <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.96 }}
-                      className="absolute top-full left-0 mt-3 w-72 bg-[#0c182c] border border-gold-400/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] p-3.5 z-[100]"
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full left-0 pt-2 w-72 z-[100]"
                     >
-                      <div className="text-xs font-semibold text-gold-400 uppercase tracking-wider px-3 py-1 mb-1">
-                        Financial Calculators
-                      </div>
-                      <div className="space-y-1">
-                        {calculators.map((calc) => (
-                          <Link
-                            key={calc.href}
-                            to={calc.href}
-                            className="flex flex-col p-2.5 rounded-xl hover:bg-white/10 transition-all group"
-                          >
-                            <span className="text-sm font-semibold text-white group-hover:text-gold-400 transition-colors">
-                              {calc.name}
-                            </span>
-                            <span className="text-xs text-white/50">{calc.desc}</span>
-                          </Link>
-                        ))}
+                      <div className="bg-[#0c182c] border border-gold-400/40 rounded-2xl shadow-[0_25px_60px_rgba(0,0,0,0.95)] p-3.5">
+                        <div className="text-xs font-semibold text-gold-400 uppercase tracking-wider px-3 py-1 mb-1">
+                          Financial Calculators
+                        </div>
+                        <div className="space-y-1">
+                          {calculators.map((calc) => (
+                            <Link
+                              key={calc.href}
+                              to={calc.href}
+                              onClick={() => setCalcDropdownOpen(false)}
+                              className="flex flex-col p-2.5 rounded-xl hover:bg-white/10 transition-all group"
+                            >
+                              <span className="text-sm font-semibold text-white group-hover:text-gold-400 transition-colors">
+                                {calc.name}
+                              </span>
+                              <span className="text-xs text-white/50">{calc.desc}</span>
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     </motion.div>
                   )}
