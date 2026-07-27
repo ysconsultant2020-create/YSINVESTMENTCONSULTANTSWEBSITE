@@ -231,6 +231,17 @@ exports.seedData = async (req, res, next) => {
           features: 'Flexible sum insured options, tenant liability cover.',
           eligibility: 'Business owners & shopkeepers',
           isActive: true
+        },
+        {
+          title: 'ICICI Prudential iProtect Smart Shield',
+          category: 'ICICI Insurance',
+          description: 'Comprehensive term life & critical illness cover with lump sum payout on 34 critical illnesses and accidental death protection.',
+          benefits: 'Tax benefits under Sec 80C & 10(10D), terminal illness acceleration benefit.',
+          premium: '₹9,600 / year',
+          coverage: '₹1 Crore',
+          features: 'Multiple payout options (Lump sum / Monthly Income), life stage cover upgrade.',
+          eligibility: '18 to 65 Years',
+          isActive: true
         }
       ]);
     }

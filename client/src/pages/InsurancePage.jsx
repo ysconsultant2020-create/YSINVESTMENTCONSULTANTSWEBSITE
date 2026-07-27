@@ -7,7 +7,7 @@ import AppointmentForm from '../components/client/AppointmentForm';
 import { insuranceAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
-const categories = ['Health Insurance', 'Motor Insurance', 'Non-Motor Insurance'];
+const categories = ['Health Insurance', 'Motor Insurance', 'Non-Motor Insurance', 'ICICI Insurance'];
 
 const InsurancePage = () => {
   const [activeCategory, setActiveCategory] = useState('');

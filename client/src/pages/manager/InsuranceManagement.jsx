@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, X, Search, Shield } from 'lucide-react';
 import { insuranceAPI } from '../../services/api';
 import toast from 'react-hot-toast';
 
-const categories = ['Health Insurance', 'Motor Insurance', 'Non-Motor Insurance'];
+const categories = ['Health Insurance', 'Motor Insurance', 'Non-Motor Insurance', 'ICICI Insurance'];
 
 const emptyForm = {
   title: '', category: 'Health Insurance', description: '', benefits: '',
