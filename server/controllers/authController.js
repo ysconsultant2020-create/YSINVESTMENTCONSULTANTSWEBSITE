@@ -7,7 +7,8 @@ const MANAGER_EMAIL = 'Manager@YS.com';
 const MANAGER_PASSWORD = 'YS@1997';
 
 const generateToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
+  const secret = process.env.JWT_SECRET || 'ys_investment_consultants_jwt_secret_2024';
+  return jwt.sign(payload, secret, { expiresIn: '7d' });
 };
 
 // Register client

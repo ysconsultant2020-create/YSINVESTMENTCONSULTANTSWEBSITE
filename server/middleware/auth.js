@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const getJwtSecret = () => process.env.JWT_SECRET || 'ys_investment_consultants_jwt_secret_2024';
+
 // Protect routes - verify JWT
 const protect = async (req, res, next) => {
   let token;
@@ -14,10 +16,10 @@ const protect = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, getJwtSecret());
 
     // Check if it's the manager (hardcoded)
-    if (decoded.role === 'manager') {
+    if (decoded.role === 'manager' || decoded.id === 'manager') {
       req.user = {
         _id: 'manager',
         name: 'YS Manager',
@@ -40,7 +42,11 @@ const protect = async (req, res, next) => {
 
 // Manager only middleware
 const managerOnly = (req, res, next) => {
-  if (req.user && req.user.role === 'manager') {
+  if (
+    req.user &&
+    (req.user.role === 'manager' ||
+      (req.user.email && req.user.email.toLowerCase() === 'manager@ys.com'))
+  ) {
     next();
   } else {
     res.status(403).json({ message: 'Access denied. Manager only.' });
@@ -66,8 +72,8 @@ const optionalAuth = async (req, res, next) => {
     return next();
   }
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    if (decoded.role === 'manager') {
+    const decoded = jwt.verify(token, getJwtSecret());
+    if (decoded.role === 'manager' || decoded.id === 'manager') {
       req.user = { _id: 'manager', name: 'YS Manager', email: 'Manager@YS.com', role: 'manager' };
     } else {
       req.user = await User.findById(decoded.id).select('-password');
