@@ -59,29 +59,23 @@ const uploadSingle = (fieldname) => {
       const ext = path.extname(req.file.originalname) || '.png';
       const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1E9) + ext;
 
-      // If Cloudinary is configured, attempt upload via stream
+      // If Cloudinary is configured, attempt upload via base64 Data URI
       if (isCloudinaryConfigured()) {
         try {
-          const uploadPromise = new Promise((resolve, reject) => {
-            const stream = cloudinary.uploader.upload_stream(
-              {
-                folder: 'ys_investment_consultants',
-                public_id: path.basename(uniqueName, ext),
-                resource_type: 'auto'
-              },
-              (cloudErr, result) => {
-                if (cloudErr) return reject(cloudErr);
-                resolve(result);
-              }
-            );
-            stream.end(req.file.buffer);
+          const b64 = Buffer.from(req.file.buffer).toString('base64');
+          const dataURI = `data:${req.file.mimetype || 'image/png'};base64,${b64}`;
+
+          const result = await cloudinary.uploader.upload(dataURI, {
+            folder: 'ys_investment_consultants',
+            resource_type: 'auto'
           });
 
-          const result = await uploadPromise;
-          req.file.path = result.secure_url;
-          return next();
+          if (result && result.secure_url) {
+            req.file.path = result.secure_url;
+            return next();
+          }
         } catch (cloudErr) {
-          console.warn('Cloudinary upload error, falling back to local file saving:', cloudErr.message);
+          console.warn('Cloudinary upload error, falling back to local file saving:', cloudErr.message || cloudErr);
         }
       }
 
