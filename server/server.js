@@ -29,7 +29,9 @@ app.use('/api', limiter);
 
 // CORS
 app.use(cors({
-  origin: process.env.CLIENT_URL || true,
+  origin: function (origin, callback) {
+    callback(null, true);
+  },
   credentials: true
 }));
 

@@ -23,7 +23,7 @@ const LoginForm = () => {
     }
     setIsLoading(true);
     try {
-      const user = await login(email, password);
+      const user = await login(email.trim(), password.trim());
       toast.success(`Welcome back${user.name ? ', ' + user.name : ''}!`);
       navigate(user.role === 'manager' ? '/manager' : '/dashboard');
     } catch (err) {

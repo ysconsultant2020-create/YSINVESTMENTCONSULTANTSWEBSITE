@@ -52,9 +52,11 @@ exports.register = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const cleanPassword = (password || '').trim();
 
     // Check if it's manager
-    if (email.toLowerCase() === MANAGER_EMAIL.toLowerCase() && password === MANAGER_PASSWORD) {
+    if (cleanEmail === MANAGER_EMAIL.toLowerCase() && cleanPassword === MANAGER_PASSWORD) {
       const token = generateToken({ id: 'manager', role: 'manager' });
       return res.json({
         token,
@@ -68,12 +70,12 @@ exports.login = async (req, res, next) => {
     }
 
     // Client login
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    const user = await User.findOne({ email: cleanEmail }).select('+password');
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const isMatch = await user.comparePassword(password);
+    const isMatch = await user.comparePassword(cleanPassword);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
